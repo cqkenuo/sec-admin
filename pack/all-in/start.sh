@@ -4,7 +4,7 @@ if [ "$UPDATE" == "yes" ];then
   git fetch --all
   git reset --hard origin/master
   git pull
-  cd /var/www/html/xn-scannode/
+  cd /var/www/html/sec-scannode/
   git fetch --all
   git reset --hard origin/master
   git pull
@@ -21,14 +21,9 @@ nohup redis-server &
 
 echo -e "\n\n\033[33m waiting mysql start... \033[0m\n\n"
 service mysql restart
-if [ -e /db_check_do_not_delete ]; then
-	echo "skip db init."
-else
-  echo -e "\n\n\033[33m waiting db init... \033[0m\n\n"
-	mysql -uroot < /var/www/html/sec-admin/pack/create_db.sql
-	touch /db_check_do_not_delete
-fi
-cd /var/www/html/xn-scannode/
+echo -e "\n\n\033[33m waiting db init... \033[0m\n\n"
+mysql -uroot < /var/www/html/sec-admin/pack/all-in/create_db.sql
+cd /var/www/html/sec-scannode/
 pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
 echo -e "\n\n\033[33m starting task node... \033[0m\n\n"
 for i in $(seq 1 $NODE_COUNT);
@@ -54,4 +49,5 @@ else
 fi
 echo -e "\033[32m Service Started . \033[0m"
 cd /var/www/html/sec-admin/
-python3 -u task.py
+nohup python3 -u task.py &
+python3 -u subscan.py
